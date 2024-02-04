@@ -34,8 +34,8 @@ const useStyles = makeStyles(theme => ({
 	root: {
 		width: "100vw",
 		height: "100vh",
-		background: "linear-gradient(to right, #0000FF , #0000CD , #000080)",
-		//backgroundImage: "url(https://equipechat.com/imagens/equipechat.jpg)",
+		//background: "linear-gradient(to right, #0000FF , #0000CD , #000080)",
+		backgroundImage: "url(https://drogariascumani.com.br/cdn/shop/files/TELA_BG_1400x.jpg)",
 		backgroundRepeat: "no-repeat",
 		backgroundSize: "100% 100%",
 		backgroundPosition: "center",
