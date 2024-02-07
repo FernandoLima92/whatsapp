@@ -47,14 +47,27 @@ const TicketListItemCustom = ({ ticket }) => {
         status: "open",
         userId: user?.id,
       });
-      if (isMounted.current) {
-        setLoading(false);
-        history.push(`/tickets/${ticket.uuid}`);
+      // if (isMounted.current) {
+      //   setLoading(false);
+      //   history.push(`/tickets/${ticket.uuid}`);
+      // }
+
+      let settingIndex;
+
+      try {
+          const { data } = await api.get("/settings/");
+          settingIndex = data.filter((s) => s.key === "sendGreetingAccepted");
+      } catch (err) {
+          toastError(err);
+      }
+
+      if (settingIndex[0].value === "enabled" && !ticket.isGroup) {
+          handleSendMessage(ticket.id);
       }
     } catch (err) {
       if (isMounted.current) {
         setLoading(false);
-        toastError(err);
+        history.push(`/tickets/${ticket.uuid}`);
       }
     }
   };
