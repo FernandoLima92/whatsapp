@@ -88,7 +88,13 @@ const TicketListItemCustom = ({ ticket }) => {
 };
 
   return (
-    <React.Fragment>
+    <React.Fragment key={ticket.id}>
+      <TicketMessagesDialog
+        open={openTicketMessageDialog}
+
+        handleClose={() => setOpenTicketMessageDialog(false)}
+        ticketId={ticket.id}
+      ></TicketMessagesDialog>
       <ListItem
         dense
         button
