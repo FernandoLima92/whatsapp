@@ -103,7 +103,29 @@ const TicketListItemCustom = ({ ticket }) => {
           <span style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }} className={classes.ticketQueueColor}></span>
         </Tooltip>
         <ListItemAvatar>
-          <Avatar src={ticket?.contact?.profilePicUrl} />
+          {ticket.status !== "pending" ?
+            <Avatar
+              style={{
+                marginTop: "-20px",
+                marginLeft: "-3px",
+                width: "55px",
+                height: "55px",
+                borderRadius: "10%",
+              }}
+              src={ticket?.contact?.profilePicUrl}
+            />
+            :
+            <Avatar
+              style={{
+                marginTop: "-30px",
+                marginLeft: "0px",
+                width: "50px",
+                height: "50px",
+                borderRadius: "10%",
+              }}
+              src={ticket?.contact?.profilePicUrl}
+            />
+          }
         </ListItemAvatar>
         <ListItemText
           primary={<Typography variant="body2">{ticket.contact.name}</Typography>}
