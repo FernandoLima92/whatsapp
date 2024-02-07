@@ -5,7 +5,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import ListItemText from "@material-ui/core/ListItemText";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@material-ui/core/Typography";   
 import Divider from "@material-ui/core/Divider";
 import Tooltip from "@material-ui/core/Tooltip";
 import ButtonWithSpinner from "../ButtonWithSpinner";
@@ -58,6 +58,21 @@ const TicketListItemCustom = ({ ticket }) => {
       }
     }
   };
+
+  const handleSendMessage = async (id) => {
+    const msg = `{{ms}} *{{name}}*, meu nome é *${user?.name}* e agora vou prosseguir com seu atendimento!`;
+    const message = {
+        read: 1,
+        fromMe: true,
+        mediaUrl: "",
+        body: `*Mensagem Automática:*\n${msg.trim()}`,
+    };
+    try {
+        await api.post(`/messages/${id}`, message);
+    } catch (err) {
+        toastError(err);
+    }
+};
 
   return (
     <React.Fragment>
