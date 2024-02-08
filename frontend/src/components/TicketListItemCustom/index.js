@@ -1,29 +1,187 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
+
 import { useHistory, useParams } from "react-router-dom";
+import { parseISO, format, isSameDay } from "date-fns";
+import clsx from "clsx";
+
 import { makeStyles } from "@material-ui/core/styles";
+import { green, grey, red, blue } from "@material-ui/core/colors";
 import ListItem from "@material-ui/core/ListItem";
-import ListItemAvatar from "@material-ui/core/ListItemAvatar";
-import Avatar from "@material-ui/core/Avatar";
 import ListItemText from "@material-ui/core/ListItemText";
-import Typography from "@material-ui/core/Typography";   
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import Typography from "@material-ui/core/Typography";
+import Avatar from "@material-ui/core/Avatar";
 import Divider from "@material-ui/core/Divider";
-import Tooltip from "@material-ui/core/Tooltip";
-import ButtonWithSpinner from "../ButtonWithSpinner";
-import { AuthContext } from "../../context/Auth/AuthContext";
-import api from "../../services/api";
-import toastError from "../../errors/toastError";
+import Badge from "@material-ui/core/Badge";
+import Box from "@material-ui/core/Box";
+
 import { i18n } from "../../translate/i18n";
 
-// Substitua os estilos de exemplo pelos seus estilos reais
+import api from "../../services/api";
+import ButtonWithSpinner from "../ButtonWithSpinner";
+import MarkdownWrapper from "../MarkdownWrapper";
+import { Tooltip } from "@material-ui/core";
+import { AuthContext } from "../../context/Auth/AuthContext";
+import { TicketsContext } from "../../context/Tickets/TicketsContext";
+import toastError from "../../errors/toastError";
+import { v4 as uuidv4 } from "uuid";
+
+import RoomIcon from '@material-ui/icons/Room';
+import WhatsAppIcon from "@material-ui/icons/WhatsApp";
+import AndroidIcon from "@material-ui/icons/Android";
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import TicketMessagesDialog from "../TicketMessagesDialog";
+import DoneIcon from '@material-ui/icons/Done';
+import ClearOutlinedIcon from '@material-ui/icons/ClearOutlined';
+import contrastColor from "../../helpers/contrastColor";
+import ContactTag from "../ContactTag";
+
 const useStyles = makeStyles((theme) => ({
   ticket: {
     position: "relative",
   },
+
+  pendingTicket: {
+    cursor: "unset",
+  },
+  queueTag: {
+    background: "#FCFCFC",
+    color: "#000",
+    marginRight: 1,
+    padding: 1,
+    fontWeight: 'bold',
+    paddingLeft: 5,
+    paddingRight: 5,
+    borderRadius: 3,
+    fontSize: "0.8em",
+    whiteSpace: "nowrap"
+  },
+  noTicketsDiv: {
+    display: "flex",
+    height: "100px",
+    margin: 40,
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  newMessagesCount: {
+    position: "absolute",
+    alignSelf: "center",
+    marginRight: 8,
+    marginLeft: "auto",
+    top: "10px",
+    left: "20px",
+    borderRadius: 0,
+  },
+  noTicketsText: {
+    textAlign: "center",
+    color: "rgb(104, 121, 146)",
+    fontSize: "14px",
+    lineHeight: "1.4",
+  },
+  connectionTag: {
+    background: "green",
+    color: "#FFF",
+    marginRight: 1,
+    padding: 1,
+    fontWeight: 'bold',
+    paddingLeft: 5,
+    paddingRight: 5,
+    borderRadius: 3,
+    fontSize: "0.8em",
+    whiteSpace: "nowrap"
+  },
+  noTicketsTitle: {
+    textAlign: "center",
+    fontSize: "16px",
+    fontWeight: "600",
+    margin: "0px",
+  },
+
+  contactNameWrapper: {
+    display: "flex",
+    justifyContent: "space-between",
+    marginLeft: "5px",
+  },
+
+  lastMessageTime: {
+    justifySelf: "flex-end",
+    textAlign: "right",
+    position: "relative",
+    top: -21
+  },
+
+  closedBadge: {
+    alignSelf: "center",
+    justifySelf: "flex-end",
+    marginRight: 32,
+    marginLeft: "auto",
+  },
+
+  contactLastMessage: {
+    paddingRight: "0%",
+    marginLeft: "5px",
+  },
+
+
+  badgeStyle: {
+    color: "white",
+    backgroundColor: green[500],
+  },
+
   acceptButton: {
     position: "absolute",
-    right: 10,
+    right: "108px",
   },
-  // Adicione mais estilos conforme necessário
+
+
+  acceptButton: {
+    position: "absolute",
+    left: "50%",
+  },
+
+
+  ticketQueueColor: {
+    flex: "none",
+    width: "8px",
+    height: "100%",
+    position: "absolute",
+    top: "0%",
+    left: "0%",
+  },
+
+  ticketInfo: {
+    position: "relative",
+    top: -13
+  },
+  secondaryContentSecond: {
+    display: 'flex',
+    // marginTop: 5,
+    //marginLeft: "5px",
+    alignItems: "flex-start",
+    flexWrap: "wrap",
+    flexDirection: "row",
+    alignContent: "flex-start",
+  },
+  ticketInfo1: {
+    position: "relative",
+    top: 13,
+    right: 0
+  },
+  Radiusdot: {
+    "& .MuiBadge-badge": {
+      borderRadius: 2,
+      position: "inherit",
+      height: 16,
+      margin: 2,
+      padding: 3
+    },
+    "& .MuiBadge-anchorOriginTopRightRectangle": {
+      transform: "scale(1) translate(0%, -40%)",
+    },
+
+  }
 }));
 
 const TicketListItemCustom = ({ ticket }) => {
