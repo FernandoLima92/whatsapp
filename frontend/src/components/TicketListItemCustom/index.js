@@ -487,7 +487,7 @@ const useStyles = makeStyles((theme) => ({
 
         </ListItemSecondaryAction>
         <span className={classes.secondaryContentSecond} >
-          {ticket.status === "pending" && (
+          {ticket.status === "pending" && ticket.queue && (
             <ButtonWithSpinner
               //color="primary"
               style={{ backgroundColor: 'green', color: 'white', padding: '0px', bottom: '17px', borderRadius: '0px', left: '8px', fontSize: '0.6rem' }}
@@ -495,8 +495,11 @@ const useStyles = makeStyles((theme) => ({
               className={classes.acceptButton}
               size="small"
               loading={loading}
-			  //PLW DESIGN INSERIDO O handleChangeTab
-              onClick={e => handleAcepptTicket(ticket.id)}
+			  //PLW DESIGN INSERIDO O handleChangeT ab
+        onClick={(e) => {
+          e.stopPropagation(); // Impede que o evento de clique no ListItem seja acionado
+          handleAcepptTicket(ticket.id);
+        }}
             >
               {i18n.t("ticketsList.buttons.accept")}
             </ButtonWithSpinner>
