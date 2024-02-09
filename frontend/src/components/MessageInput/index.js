@@ -311,6 +311,43 @@ const MessageInput = ({ ticketStatus }) => {
 		}
 	};
 
+	const handleKeyDown = (e) => {
+		// Lógica para enviar mensagem quando Enter é pressionado sem Shift
+		if (e.key === 'Enter' && !e.shiftKey) {
+		  e.preventDefault(); // Impede a quebra de linha
+		  handleSendMessage();
+		  return;
+		}
+	
+		// Navegação com as setas para cima e para baixo
+		if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+		  const { selectionStart, value } = inputRef.current;
+		  const lines = value.split('\n');
+		  let pos = 0;
+		  let lineStart = 0;
+		  let lineEnd = 0;
+	
+		  for (let line of lines) {
+			lineEnd += line.length + 1; // +1 para a quebra de linha
+			if (lineEnd > selectionStart) break;
+			lineStart = lineEnd;
+			pos++;
+		  }
+	
+		  if (e.key === 'ArrowUp' && pos > 0) {
+			e.preventDefault(); // Impede o scroll do navegador
+			// Calcula a posição aproximada na linha acima
+			let newPos = selectionStart - lines[pos - 1].length - 1;
+			inputRef.current.setSelectionRange(newPos, newPos);
+		  } else if (e.key === 'ArrowDown' && pos < lines.length - 1) {
+			e.preventDefault(); // Impede o scroll do navegador
+			// Calcula a posição aproximada na linha abaixo
+			let newPos = lineEnd;
+			inputRef.current.setSelectionRange(newPos, newPos);
+		  }
+		}
+	  };
+
 	const renderReplyingMessage = message => {
 		return (
 			<div className={classes.replyginMsgWrapper}>
@@ -449,12 +486,7 @@ const MessageInput = ({ ticketStatus }) => {
 							onPaste={e => {
 								ticketStatus === "open" && handleInputPaste(e);
 							}}
-							onKeyPress={e => {
-								if (loading || e.shiftKey) return;
-								else if (e.key === "Enter") {
-									handleSendMessage();
-								}
-							}}
+							onKeyPress={handleKeyDown}
 						/>
 					</div>
 					{inputMessage ? (
