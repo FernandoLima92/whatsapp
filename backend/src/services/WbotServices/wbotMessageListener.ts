@@ -713,14 +713,14 @@ const verifyQueue = async (
 
 
 
-  if (queues.length === 1) {
-    const firstQueue = head(queues);
-    let chatbot = false;
-    if (firstQueue?.options) {
-      chatbot = firstQueue.options.length > 0;
-    }
+  if (queues.length >= 1) {
+    // const firstQueue = head(queues);
+    // let chatbot = false;
+    // if (firstQueue?.options) {
+    //   chatbot = firstQueue.options.length > 0;
+    // }
     await UpdateTicketService({
-      ticketData: { queueId: firstQueue?.id, chatbot },
+      ticketData: { queueId: queues[0].id },
       ticketId: ticket.id,
       companyId: ticket.companyId,
     });
