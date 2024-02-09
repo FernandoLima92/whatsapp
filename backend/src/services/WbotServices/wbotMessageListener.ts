@@ -713,23 +713,60 @@ const verifyQueue = async (
 
 
 
+  // if (queues.length === 1) {
+  //   const firstQueue = head(queues);
+  //   let chatbot = false;
+  //   if (firstQueue?.options) {
+  //     chatbot = firstQueue.options.length > 0;
+  //   }
+  //   await UpdateTicketService({
+  //     ticketData: { queueId: firstQueue?.id, chatbot },
+  //     ticketId: ticket.id,
+  //     companyId: ticket.companyId,
+  //   });
+
+  //   return;
+  // }
+
   if (queues.length === 1) {
-    const firstQueue = head(queues);
-    let chatbot = false;
-    if (firstQueue?.options) {
-      chatbot = firstQueue.options.length > 0;
-    }
+    const firstQueue = queues[0]; // Assume que head(queues) retorna o primeiro elemento
+    let chatbot = firstQueue?.options && firstQueue.options.length > 0;
     await UpdateTicketService({
       ticketData: { queueId: firstQueue?.id, chatbot },
       ticketId: ticket.id,
       companyId: ticket.companyId,
     });
-
-    return;
+    return; // Finaliza a execução se só houver uma fila
   }
 
+  const timeoutId = setTimeout(async () => {
+    // Verifica novamente se uma opção foi escolhida antes de proceder
+    // Isso pode envolver verificar o estado atualizado do ticket ou uma variável que indique uma escolha
+    if (!choosenQueue) { // Supondo que choosenQueue possa ser atualizado/verificado novamente aqui
+      const firstQueue = queues[0];
+      let chatbot = firstQueue?.options && firstQueue.options.length > 0;
+      await UpdateTicketService({
+        ticketData: { queueId: firstQueue?.id, chatbot },
+        ticketId: ticket.id,
+        companyId: ticket.companyId,
+      });
+  
+      // Envio da mensagem informando sobre o redirecionamento automático
+      const autoRedirectMessage = `Você foi automaticamente direcionado para a fila ${firstQueue.name} por não selecionar uma opção.`;
+      await wbot.sendMessage(`${contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`, {
+        text: autoRedirectMessage
+      });
+    }
+  }, 10000);
+  
+  // Processamento da escolha do usuário
   const selectedOption = getBodyMessage(msg);
   const choosenQueue = queues[+selectedOption - 1];
+  
+  // Se uma escolha foi feita, cancela o timeout para evitar redirecionamento automático
+  if (choosenQueue) {
+    clearTimeout(timeoutId);
+  }
 
   const companyId = ticket.companyId;
 

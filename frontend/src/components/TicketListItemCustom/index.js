@@ -496,9 +496,7 @@ const useStyles = makeStyles((theme) => ({
               size="small"
               loading={loading}
 			  //PLW DESIGN INSERIDO O handleChangeT ab
-        onClick={(e) => {
-          e.stopPropagation(); // Impede que o evento de clique no ListItem seja acionado
-          handleAcepptTicket(ticket.id);
+        onClick={(e) => {handleAcepptTicket(ticket.id);
         }}
             >
               {i18n.t("ticketsList.buttons.accept")}
