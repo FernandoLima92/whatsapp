@@ -743,7 +743,7 @@ const verifyQueue = async (
     // Verifica novamente se uma opção foi escolhida antes de proceder
     // Isso pode envolver verificar o estado atualizado do ticket ou uma variável que indique uma escolha
     if (!choosenQueue) { // Supondo que choosenQueue possa ser atualizado/verificado novamente aqui
-      const firstQueue = queues[0];
+      const firstQueue = queues[0]; 
       let chatbot = firstQueue?.options && firstQueue.options.length > 0;
       await UpdateTicketService({
         ticketData: { queueId: firstQueue?.id, chatbot },
